@@ -1,25 +1,34 @@
 
 # coding: utf-8
+
 import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
+from PyQt5.QtNetwork import *
+from urllib.request import Request, urlopen
 
 from movie import *
-from Tour import *
+from tour import *
+
+##global
+movieMAX = 10
+festivalMAX = 4
 
 class Form(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        # 최대개수
-        self.movieMAX = 10
-        self.festivalMAX = 4
+        from datetime import date
+        import time
 
         QtWidgets.QDialog.__init__(self, parent)
         self.ui = uic.loadUi("ui.ui",self)
         self.ui.setWindowTitle("TheLove")
         self.ui.setWindowIcon(QIcon('heart.png'))
+        self.ui.dateEdit_Movie.setDate(date.fromtimestamp(time.time()-60*60*24)) #어제
+        self.ui.dateEdit_Festival.setDate(date.today())
+
         self.ui.show()
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
                          [self.ui.rank_1, self.ui.movieNm_1, self.ui.openDt_1, self.ui.audiAcc_1],
@@ -38,19 +47,19 @@ class Form(QtWidgets.QDialog):
                              [self.ui.imageF_3, self.ui.titleF_3, self.ui.addrF_3, self.ui.startend_3, self.ui.weather_3],
                             ]
 
-    # type = 0 영화, 1 행사
+    # errorType = 0 영화, 1 행사
     def error(self,errorType,keyword):
         QMessageBox.information(self, "Error", "[" + keyword + "]에 관한 데이터가 없습니다.")
 
         #빈칸 초기화
         if errorType == 0:
-            for i in range(0, 10):
+            for i in range(0, movieMAX):
                 self.movieArr[i][0].setText('-')
                 self.movieArr[i][1].setText('-')
                 self.movieArr[i][2].setText('-')
                 self.movieArr[i][3].setText('-')
         elif errorType == 1:
-            for i in range(0, 4):
+            for i in range(0, festivalMAX):
                 self.festivalArr[i][0].setText('-')
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
@@ -104,24 +113,33 @@ class Form(QtWidgets.QDialog):
         strDate += str(date.day())
 
         FestivalList = getFestivalDataFromDate(strDate)
-        FestivalInfo = getFestivalInfo(FestivalList)
+        FestivalInfo = getFestivalInfo(FestivalList,strDate)
 
         if FestivalInfo == None:
             self.error(1, strDate)
             return
 
+
         #축제 텍스트 설정
         y=0
+        buffer = QPixmap()
         for festival in FestivalInfo:
-            self.festivalArr[y][0].setText(festival['image'])
+            #이미지보여주기
+            req = Request(festival['image'], headers={'User-Agent': 'Mozilla/5.0'})
+            data = urlopen(req).read()
+            buffer.loadFromData(data)
+            self.festivalArr[y][0].setPixmap(buffer.scaled(self.festivalArr[y][0].size()))
+            #self.festivalArr[y][0].move(0, 0)
+            self.festivalArr[y][0].show()
+
             self.festivalArr[y][1].setText(festival['title'])
             self.festivalArr[y][2].setText(festival['addr'])
             self.festivalArr[y][3].setText(festival['eventdate'])
-            y+=1
-            if y == 4:
+            y += 1
+            if y == festivalMAX:
                 break
-        if y != 4:
-            for i in range(y,4):
+        if y != festivalMAX:
+            for i in range(y,festivalMAX):
                 self.festivalArr[i][0].setText('-')
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
