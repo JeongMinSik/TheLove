@@ -65,9 +65,15 @@ class Form(QtWidgets.QDialog):
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
 
+
     # 영화 데이터 불러오기
     @pyqtSlot()
     def showMovieData(self):
+        #옵션값
+        type_txt = self.ui.mComboBox_type.currentText()
+        multi_txt = self.ui.mComboBox_multi.currentText()
+        nation_txt = self.ui.mComboBox_nation.currentText()
+
         # 날짜 불러오기
         date = self.ui.dateEdit_Movie.date()
         strDate = ''
@@ -79,8 +85,13 @@ class Form(QtWidgets.QDialog):
             strDate += '0'
         strDate += str(date.day())
 
-        movieList = getMovieDataFromDate(strDate)
-        info, list = getMovieInfo(movieList)
+        type = None
+        if type_txt == '일별':
+            type = 'dailyBoxOffice'
+        else:
+            type = 'weeklyBoxOffice'
+        movieList = getMovieDataFromDate(strDate,type,type_txt,multi_txt,nation_txt)
+        info, list = getMovieInfo(movieList,type)
 
         if info==None:
             self.error(0,strDate)
