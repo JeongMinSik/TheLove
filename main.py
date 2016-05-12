@@ -27,7 +27,12 @@ class Form(QtWidgets.QDialog):
         self.ui.setWindowTitle("TheLove")
         self.ui.setWindowIcon(QIcon('heart.png'))
         self.ui.dateEdit_Movie.setDate(date.fromtimestamp(time.time()-60*60*24)) #어제
-        self.ui.dateEdit_Festival.setDate(date.today())
+        self.ui.dateEdit_Tour.setDate(date.today())
+
+        self.ui.checkBox_keyword.toggle()
+        #self.ui.checkBox_festival.toggle()
+        self.ui.checkBox_keyword.stateChanged.connect(self.changeKeyword)
+        self.ui.checkBox_festival.stateChanged.connect(self.changeFestival)
 
         self.ui.show()
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
@@ -46,6 +51,22 @@ class Form(QtWidgets.QDialog):
                              [self.ui.imageF_2, self.ui.titleF_2, self.ui.addrF_2, self.ui.startend_2, self.ui.weather_2],
                              [self.ui.imageF_3, self.ui.titleF_3, self.ui.addrF_3, self.ui.startend_3, self.ui.weather_3],
                             ]
+
+    def changeKeyword(self,state):
+        if state == Qt.Checked:
+            self.ui.checkBox_festival.setCheckState(Qt.Unchecked)
+            self.ui.ComboBox_content.setEnabled(True)
+            self.ui.lineEdit_keyword.setEnabled(True)
+        else:
+            self.ui.checkBox_festival.setCheckState(Qt.Checked)
+            self.ui.ComboBox_content.setEnabled(False)
+            self.ui.lineEdit_keyword.setEnabled(False)
+
+    def changeFestival(self, state):
+        if state == Qt.Checked:
+            self.ui.checkBox_keyword.setCheckState(Qt.Unchecked)
+        else:
+            self.ui.checkBox_keyword.setCheckState(Qt.Checked)
 
     # errorType = 0 영화, 1 행사
     def error(self,errorType,keyword):
@@ -111,9 +132,15 @@ class Form(QtWidgets.QDialog):
 
     #행사 데이터 불러오기
     @pyqtSlot()
-    def showFestivalData(self):
+    def showTourData(self):
+
+        # 옵션값 불러오기
+        area_txt = self.ui.ComboBox_area.currentText()
+        content_txt = self.ui.ComboBox_content.currentText()
+        keyword_txt = self.ui.lineEdit_keyword.text()
+
         # 날짜 불러오기
-        date = self.ui.dateEdit_Festival.date()
+        date = self.ui.dateEdit_Tour.date()
         strDate = ''
         strDate += str(date.year())
         if date.month() < 10:
@@ -123,18 +150,28 @@ class Form(QtWidgets.QDialog):
             strDate += '0'
         strDate += str(date.day())
 
-        FestivalList = getFestivalDataFromDate(strDate)
-        FestivalInfo = getFestivalInfo(FestivalList,strDate)
+        TourInfo = None
 
-        if FestivalInfo == None:
-            self.error(1, strDate)
-            return
+        if self.ui.checkBox_keyword.isChecked() == True:
+            FestivalList = getTourDataFromDate('searchKeyword', area_txt, strDate,content_txt,keyword_txt)
+            TourInfo = getTourInfo(True,FestivalList,strDate)
+            if TourInfo == None:
+                self.error(1, keyword_txt)
+                return
+        else:
+            FestivalList = getTourDataFromDate('searchFestival',area_txt,strDate)
+            TourInfo = getTourInfo(False,FestivalList,strDate)
+            if TourInfo == None:
+                self.error(1, strDate)
+                return
+
+
 
 
         #축제 텍스트 설정
         y=0
         buffer = QPixmap()
-        for festival in FestivalInfo:
+        for festival in TourInfo:
             #이미지보여주기
             req = Request(festival['image'], headers={'User-Agent': 'Mozilla/5.0'})
             data = urlopen(req).read()
@@ -157,7 +194,7 @@ class Form(QtWidgets.QDialog):
                 self.festivalArr[i][3].setText('-')
 
         # 결과창
-        QMessageBox.information(self, "Info", "\n 행사 조회가 완료되었습니다!")
+        QMessageBox.information(self, "Info", "\n 데이트정보 조회가 완료되었습니다!")
 
 if __name__ == '__main__':
     while(True):
