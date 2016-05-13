@@ -2,12 +2,12 @@
 # coding: utf-8
 
 import sys
-from PyQt5 import QtWidgets
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5 import uic
 from PyQt5.QtNetwork import *
+from PyQt5 import uic
 from urllib.request import Request, urlopen
 
 from movie import *
@@ -15,22 +15,31 @@ from tour import *
 
 ##global
 movieMAX = 10
-festivalMAX = 4
+festivalMAX = 6
 
-class Form(QtWidgets.QDialog):
+class Form(QDialog):
     def __init__(self, parent=None):
         from datetime import date
         import time
 
-        QtWidgets.QDialog.__init__(self, parent)
+        QDialog.__init__(self, parent)
         self.ui = uic.loadUi("ui.ui",self)
+        self.ui.setWindowIcon(QIcon('heart.ico'))
         self.ui.dateEdit_Movie.setDate(date.fromtimestamp(time.time()-60*60*24)) #어제
         self.ui.dateEdit_Tour.setDate(date.today())
 
         self.ui.checkBox_keyword.toggle()
         #self.ui.checkBox_festival.toggle()
+
+        #함수 연결
         self.ui.checkBox_keyword.stateChanged.connect(self.changeKeyword)
         self.ui.checkBox_festival.stateChanged.connect(self.changeFestival)
+
+        self.ui.movieButton.toggled.connect(self.setOffMovieButton)
+        self.ui.movieButton.clicked.connect(self.showMovieData)
+
+        self.ui.tourButton.toggled.connect(self.setOffTourButton)
+        self.ui.tourButton.clicked.connect(self.showTourData)
 
         self.ui.show()
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
@@ -48,6 +57,8 @@ class Form(QtWidgets.QDialog):
                              [self.ui.imageF_1, self.ui.titleF_1, self.ui.addrF_1, self.ui.startend_1, self.ui.weather_1],
                              [self.ui.imageF_2, self.ui.titleF_2, self.ui.addrF_2, self.ui.startend_2, self.ui.weather_2],
                              [self.ui.imageF_3, self.ui.titleF_3, self.ui.addrF_3, self.ui.startend_3, self.ui.weather_3],
+                             [self.ui.imageF_4, self.ui.titleF_4, self.ui.addrF_4, self.ui.startend_4, self.ui.weather_4],
+                             [self.ui.imageF_5, self.ui.titleF_5, self.ui.addrF_5, self.ui.startend_5, self.ui.weather_5]
                             ]
 
     def changeKeyword(self,state):
@@ -66,11 +77,24 @@ class Form(QtWidgets.QDialog):
         else:
             self.ui.checkBox_keyword.setCheckState(Qt.Checked)
 
+    def setOffMovieButton(self):
+        print("토글함수진입1")
+        self.ui.movieButton.setText("검색 중...")
+        self.ui.movieButton.setEnabled(False)
+    def setOffTourButton(self):
+        print("토글함수진입2")
+        self.ui.tourButton.setText("검색 중...")
+        self.ui.tourButton.setEnabled(False)
+    def setOnButton(self, button):
+        print("함수진입3")
+        button.setText("검색")
+        button.setEnabled(True)
+
     # errorType = 0 영화, 1 행사
     def error(self,errorType,keyword):
-        QMessageBox.information(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
+        QMessageBox.warning(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
 
-        #빈칸 초기화
+        # 빈칸 초기화
         if errorType == 0:
             for i in range(0, movieMAX):
                 self.movieArr[i][0].setText('-')
@@ -85,9 +109,9 @@ class Form(QtWidgets.QDialog):
                 self.festivalArr[i][3].setText('-')
 
 
-    # 영화 데이터 불러오기
-    @pyqtSlot()
+    # 영화데이터 불러오기
     def showMovieData(self):
+        print("영화데이터진입")
         #옵션값
         type_txt = self.ui.mComboBox_type.currentText()
         multi_txt = self.ui.mComboBox_multi.currentText()
@@ -113,6 +137,7 @@ class Form(QtWidgets.QDialog):
         info, list = getMovieInfo(movieList,type)
 
         if info==None:
+            self.setOnButton(self.ui.movieButton)
             self.error(0,"구분:" + type_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
             return
 
@@ -126,12 +151,11 @@ class Form(QtWidgets.QDialog):
             y+=1
 
         # 결과창
+        self.setOnButton(self.ui.movieButton)
         QMessageBox.information(self, "Info", info + "\n \t  조회가 완료되었습니다!")
 
     #여행 데이터 불러오기
-    @pyqtSlot()
     def showTourData(self):
-
         # 옵션값 불러오기
         area_txt = self.ui.ComboBox_area.currentText()
         content_txt = self.ui.ComboBox_content.currentText()
@@ -155,6 +179,7 @@ class Form(QtWidgets.QDialog):
             FestivalList = getTourDataFromDate('searchKeyword', area_txt, strDate,content_txt, keyword_txt)
             TourInfo = getTourInfo(True,FestivalList,strDate)
             if TourInfo == None:
+                self.setOnButton(self.ui.tourButton)
                 self.error(1, "지역:" + area_txt + ", 분류:" + content_txt +", 키워드:'" + keyword_txt + "'")
                 return
         #행사검색
@@ -162,9 +187,9 @@ class Form(QtWidgets.QDialog):
             FestivalList = getTourDataFromDate('searchFestival',area_txt,strDate)
             TourInfo = getTourInfo(False,FestivalList,strDate)
             if TourInfo == None:
+                self.setOnButton(self.ui.tourButton)
                 self.error(1, "지역:" + area_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
                 return
-
 
         #여행정보 설정
         y=0
@@ -192,10 +217,11 @@ class Form(QtWidgets.QDialog):
                 self.festivalArr[i][3].setText('-')
 
         # 결과창
+        self.setOnButton(self.ui.tourButton)
         QMessageBox.information(self, "Info", "\n 데이트정보 조회가 완료되었습니다!")
 
 if __name__ == '__main__':
     while(True):
-        app = QtWidgets.QApplication(sys.argv)
-        w = Form()
+        app = QApplication(sys.argv)
+        f = Form()
         sys.exit(app.exec())
