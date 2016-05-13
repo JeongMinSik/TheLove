@@ -24,8 +24,6 @@ class Form(QtWidgets.QDialog):
 
         QtWidgets.QDialog.__init__(self, parent)
         self.ui = uic.loadUi("ui.ui",self)
-        self.ui.setWindowTitle("TheLove")
-        self.ui.setWindowIcon(QIcon('heart.png'))
         self.ui.dateEdit_Movie.setDate(date.fromtimestamp(time.time()-60*60*24)) #어제
         self.ui.dateEdit_Tour.setDate(date.today())
 
@@ -70,7 +68,7 @@ class Form(QtWidgets.QDialog):
 
     # errorType = 0 영화, 1 행사
     def error(self,errorType,keyword):
-        QMessageBox.information(self, "Error", "[" + keyword + "]에 관한 데이터가 없습니다.")
+        QMessageBox.information(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
 
         #빈칸 초기화
         if errorType == 0:
@@ -115,10 +113,10 @@ class Form(QtWidgets.QDialog):
         info, list = getMovieInfo(movieList,type)
 
         if info==None:
-            self.error(0,strDate)
+            self.error(0,"구분:" + type_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
             return
 
-        # 영화텍스트 설정
+        # 영화정보 설정
         y=0
         for movie in list:
             self.movieArr[y][0].setText(movie['rank'])
@@ -130,7 +128,7 @@ class Form(QtWidgets.QDialog):
         # 결과창
         QMessageBox.information(self, "Info", info + "\n \t  조회가 완료되었습니다!")
 
-    #행사 데이터 불러오기
+    #여행 데이터 불러오기
     @pyqtSlot()
     def showTourData(self):
 
@@ -152,23 +150,23 @@ class Form(QtWidgets.QDialog):
 
         TourInfo = None
 
+        #키워드검색
         if self.ui.checkBox_keyword.isChecked() == True:
-            FestivalList = getTourDataFromDate('searchKeyword', area_txt, strDate,content_txt,keyword_txt)
+            FestivalList = getTourDataFromDate('searchKeyword', area_txt, strDate,content_txt, keyword_txt)
             TourInfo = getTourInfo(True,FestivalList,strDate)
             if TourInfo == None:
-                self.error(1, keyword_txt)
+                self.error(1, "지역:" + area_txt + ", 분류:" + content_txt +", 키워드:'" + keyword_txt + "'")
                 return
+        #행사검색
         else:
             FestivalList = getTourDataFromDate('searchFestival',area_txt,strDate)
             TourInfo = getTourInfo(False,FestivalList,strDate)
             if TourInfo == None:
-                self.error(1, strDate)
+                self.error(1, "지역:" + area_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
                 return
 
 
-
-
-        #축제 텍스트 설정
+        #여행정보 설정
         y=0
         buffer = QPixmap()
         for festival in TourInfo:
