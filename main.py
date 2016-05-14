@@ -29,19 +29,17 @@ class Form(QDialog):
         self.ui.dateEdit_Tour.setDate(date.today())
 
         self.ui.checkBox_keyword.toggle()
-        #self.ui.checkBox_festival.toggle()
 
         #함수 연결
         self.ui.checkBox_keyword.stateChanged.connect(self.changeKeyword)
         self.ui.checkBox_festival.stateChanged.connect(self.changeFestival)
-
         self.ui.movieButton.toggled.connect(self.setOffMovieButton)
         self.ui.movieButton.clicked.connect(self.showMovieData)
-
         self.ui.tourButton.toggled.connect(self.setOffTourButton)
         self.ui.tourButton.clicked.connect(self.showTourData)
 
         self.ui.show()
+
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
                          [self.ui.rank_1, self.ui.movieNm_1, self.ui.openDt_1, self.ui.audiAcc_1],
                          [self.ui.rank_2, self.ui.movieNm_2, self.ui.openDt_2, self.ui.audiAcc_2],
@@ -61,6 +59,7 @@ class Form(QDialog):
                              [self.ui.imageF_5, self.ui.titleF_5, self.ui.addrF_5, self.ui.startend_5, self.ui.weather_5]
                             ]
 
+
     def changeKeyword(self,state):
         if state == Qt.Checked:
             self.ui.checkBox_festival.setCheckState(Qt.Unchecked)
@@ -78,22 +77,19 @@ class Form(QDialog):
             self.ui.checkBox_keyword.setCheckState(Qt.Checked)
 
     def setOffMovieButton(self):
-        print("토글함수진입1")
         self.ui.movieButton.setText("검색 중...")
         self.ui.movieButton.setEnabled(False)
+
     def setOffTourButton(self):
-        print("토글함수진입2")
         self.ui.tourButton.setText("검색 중...")
         self.ui.tourButton.setEnabled(False)
+
     def setOnButton(self, button):
-        print("함수진입3")
         button.setText("검색")
         button.setEnabled(True)
 
     # errorType = 0 영화, 1 행사
     def error(self,errorType,keyword):
-        QMessageBox.warning(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
-
         # 빈칸 초기화
         if errorType == 0:
             for i in range(0, movieMAX):
@@ -108,10 +104,11 @@ class Form(QDialog):
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
 
+        QMessageBox.warning(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
+
 
     # 영화데이터 불러오기
     def showMovieData(self):
-        print("영화데이터진입")
         #옵션값
         type_txt = self.ui.mComboBox_type.currentText()
         multi_txt = self.ui.mComboBox_multi.currentText()
@@ -152,7 +149,7 @@ class Form(QDialog):
 
         # 결과창
         self.setOnButton(self.ui.movieButton)
-        QMessageBox.information(self, "Info", info + "\n \t  조회가 완료되었습니다!")
+        QMessageBox.information(self, "Success", info + "\n \t  조회가 완료되었습니다!")
 
     #여행 데이터 불러오기
     def showTourData(self):
@@ -176,6 +173,7 @@ class Form(QDialog):
 
         #키워드검색
         if self.ui.checkBox_keyword.isChecked() == True:
+            self.ui.startend_label.setText("분류")
             FestivalList = getTourDataFromDate('searchKeyword', area_txt, strDate,content_txt, keyword_txt)
             TourInfo = getTourInfo(True,FestivalList,strDate)
             if TourInfo == None:
@@ -184,6 +182,7 @@ class Form(QDialog):
                 return
         #행사검색
         else:
+            self.ui.startend_label.setText("시작일~종료일")
             FestivalList = getTourDataFromDate('searchFestival',area_txt,strDate)
             TourInfo = getTourInfo(False,FestivalList,strDate)
             if TourInfo == None:
@@ -218,7 +217,7 @@ class Form(QDialog):
 
         # 결과창
         self.setOnButton(self.ui.tourButton)
-        QMessageBox.information(self, "Info", "\n 데이트정보 조회가 완료되었습니다!")
+        QMessageBox.information(self, "Success", "\n 데이트정보 조회가 완료되었습니다!")
 
 if __name__ == '__main__':
     while(True):
