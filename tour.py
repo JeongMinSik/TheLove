@@ -41,7 +41,7 @@ def getTourDataFromDate(findType, area, date, content='전체 분류',keyword=''
     if conn == None:
         conn = HTTPConnection(server)
 
-    uri = userURIBuilder(server, findType, ServiceKey=regKey, eventStartDate=date, areaCode=area, contentTypeId =content, keyword = keyword,MobileOS='ETC', MobileApp='AppTesting', numOfRows='1000')
+    uri = userURIBuilder(server, findType, numOfRows='1000', ServiceKey=regKey, eventStartDate=date, areaCode=area, contentTypeId =content, keyword = keyword,MobileOS='ETC', MobileApp='AppTesting')
     try:
         conn.request("GET", uri)
         req = conn.getresponse()
@@ -61,7 +61,7 @@ def getLocationData(strX,strY):
     global server, regKey, conn
     if conn == None:
         conn = HTTPConnection(server)
-    uri = userURIBuilder(server, 'locationBasedList', ServiceKey=regKey,mapX =strX, mapY = strY, radius = '20000', numOfRows='50', arrange = 'E' , MobileApp='AppTesting',MobileOS='ETC')
+    uri = userURIBuilder(server, 'locationBasedList', numOfRows='50', ServiceKey=regKey,mapX =strX, mapY = strY, radius = '10000', arrange = 'E' , MobileApp='AppTesting',MobileOS='ETC')
     try:
         conn.request("GET", uri)
         req = conn.getresponse()
@@ -87,7 +87,7 @@ def getLocationData(strX,strY):
         try:
             if restaurant == '-' and location.find("contenttypeid").text == contentDic["음식점"]:
                 restaurant = location.find("title").text + "("+location.find("dist").text +"m)"
-            elif stay == '-' and location.find("contenttypeid").text == contentDic["숙박"]:
+            if stay == '-' and location.find("contenttypeid").text == contentDic["숙박"]:
                 stay = location.find("title").text + "(" + location.find("dist").text + "m)"
             if restaurant != '-' and stay != '-':
                 break
