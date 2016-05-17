@@ -68,7 +68,7 @@ class Form(QDialog):
             self.festivalArr[i][1].setText('-')
             self.festivalArr[i][2].setText('-')
             self.festivalArr[i][3].setText('-')
-            self.festivalArr[i][4].setText('-')
+            self.festivalArr[i][4].setText("-\n-")
 
         self.ui.show()
 
@@ -78,10 +78,12 @@ class Form(QDialog):
             self.ui.checkBox_festival.setCheckState(Qt.Unchecked)
             self.ui.ComboBox_content.setEnabled(True)
             self.ui.lineEdit_keyword.setEnabled(True)
+            self.ui.dateEdit_Tour.setEnabled(False)
         else:
             self.ui.checkBox_festival.setCheckState(Qt.Checked)
             self.ui.ComboBox_content.setEnabled(False)
             self.ui.lineEdit_keyword.setEnabled(False)
+            self.ui.dateEdit_Tour.setEnabled(True)
 
     def changeFestival(self, state):
         if state == Qt.Checked:
@@ -116,7 +118,7 @@ class Form(QDialog):
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
-                self.festivalArr[i][4].setText('-')
+                self.festivalArr[i][4].setText("-\n-")
 
         QMessageBox.warning(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
 
@@ -219,7 +221,14 @@ class Form(QDialog):
             self.festivalArr[y][1].setText(festival['title'])
             self.festivalArr[y][2].setText(festival['addr'])
             self.festivalArr[y][3].setText(festival['eventdate'])
-            self.festivalArr[y][4].setText(getLocationData(festival['mapX'],festival['mapY']))
+
+            #주변시설검색
+            location = getLocationData(festival['mapX'], festival['mapY'])
+            if location == None:
+                location = "-\n-"
+            self.festivalArr[y][4].setText(location)
+
+
             y += 1
             if y == festivalMAX:
                 break
@@ -229,7 +238,7 @@ class Form(QDialog):
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
-                self.festivalArr[i][4].setText('-')
+                self.festivalArr[i][4].setText("-\n-")
 
         # 결과창
         self.setOnButton(self.ui.tourButton)

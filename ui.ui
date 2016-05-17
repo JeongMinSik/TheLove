@@ -2077,7 +2077,7 @@
         </widget>
         <widget class="QDateEdit" name="dateEdit_Tour">
          <property name="enabled">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="geometry">
           <rect>

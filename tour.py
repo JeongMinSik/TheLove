@@ -61,7 +61,7 @@ def getLocationData(strX,strY):
     global server, regKey, conn
     if conn == None:
         conn = HTTPConnection(server)
-    uri = userURIBuilder(server, 'locationBasedList', ServiceKey=regKey,mapX =strX, mapY = strY, radius = '20000', numOfRows='100', arrange = 'E' , MobileApp='AppTesting',MobileOS='ETC')
+    uri = userURIBuilder(server, 'locationBasedList', ServiceKey=regKey,mapX =strX, mapY = strY, radius = '20000', numOfRows='50', arrange = 'E' , MobileApp='AppTesting',MobileOS='ETC')
     try:
         conn.request("GET", uri)
         req = conn.getresponse()
