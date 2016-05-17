@@ -22,7 +22,6 @@ def userURIBuilder(server, findType, **user):
             str += urlencode({key : user[key]}) +'&'
         else:
             str += key + "=" + user[key]+ '&'
-
     return str
 
 def changeOption(area,content):
@@ -57,6 +56,46 @@ def getTourDataFromDate(findType, area, date, content='전체 분류',keyword=''
         print ("Tour API request has been failed!! please retry")
         return None
 
+
+def getLocationData(strX,strY):
+    global server, regKey, conn
+    if conn == None:
+        conn = HTTPConnection(server)
+    uri = userURIBuilder(server, 'locationBasedList', ServiceKey=regKey,mapX =strX, mapY = strY, radius = '20000', numOfRows='100', arrange = 'E' , MobileApp='AppTesting',MobileOS='ETC')
+    try:
+        conn.request("GET", uri)
+        req = conn.getresponse()
+    except WindowsError as error:
+        print(error)
+        return None
+
+    locationList = None
+    if int(req.status) == 200:
+        print("Location data downloading complete!")
+        locationList = ElementTree.fromstring(req.read())
+    else:
+        print ("Location API request has been failed!! please retry")
+        return None
+
+    if locationList == None or locationList.find("body").find("totalCount").text == '0':
+        return None
+
+    locationList=locationList.getiterator("item")
+    restaurant = '-'
+    stay = '-'
+    for location in locationList:
+        try:
+            if restaurant == '-' and location.find("contenttypeid").text == contentDic["음식점"]:
+                restaurant = location.find("title").text + "("+location.find("dist").text +"m)"
+            elif stay == '-' and location.find("contenttypeid").text == contentDic["숙박"]:
+                stay = location.find("title").text + "(" + location.find("dist").text + "m)"
+            if restaurant != '-' and stay != '-':
+                break
+        except:
+            continue
+    return restaurant + "\n" + stay
+
+
 def getTourInfo(isKeyword, festivalList,date):
     if festivalList == None or festivalList.find("body").find("totalCount").text == '0':
         return None
@@ -69,6 +108,8 @@ def getTourInfo(isKeyword, festivalList,date):
             title = festival.find("title").text
             addr = festival.find("addr1").text
             image =festival.find("firstimage").text
+            mapX = festival.find("mapx").text
+            mapY = festival.find("mapy").text
 
             if isKeyword == True:
                 contentType = festival.find("contenttypeid").text
@@ -76,12 +117,12 @@ def getTourInfo(isKeyword, festivalList,date):
                     if contentType == contentDic[key]:
                         contentType = key
                         break
-                festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": contentType})
+                festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": contentType, "mapX" :mapX, "mapY" :mapY})
             else:
                 eventStartdate = festival.find("eventstartdate").text
                 eventEnddate = festival.find("eventenddate").text
                 if eventStartdate <= date <= eventEnddate:
-                    festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": eventStartdate + " ~ " + eventEnddate})
+                    festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": eventStartdate + " ~ " + eventEnddate, "mapX" :mapX, "mapY" :mapY})
         except:
             continue
     if len(festivalInfo) > 0:

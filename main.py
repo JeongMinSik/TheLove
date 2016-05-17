@@ -38,8 +38,6 @@ class Form(QDialog):
         self.ui.tourButton.toggled.connect(self.setOffTourButton)
         self.ui.tourButton.clicked.connect(self.showTourData)
 
-        self.ui.show()
-
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
                          [self.ui.rank_1, self.ui.movieNm_1, self.ui.openDt_1, self.ui.audiAcc_1],
                          [self.ui.rank_2, self.ui.movieNm_2, self.ui.openDt_2, self.ui.audiAcc_2],
@@ -51,13 +49,28 @@ class Form(QDialog):
                          [self.ui.rank_8, self.ui.movieNm_8, self.ui.openDt_8, self.ui.audiAcc_8],
                          [self.ui.rank_9, self.ui.movieNm_9, self.ui.openDt_9, self.ui.audiAcc_9],
                         ]
-        self.festivalArr = [ [self.ui.imageF_0, self.ui.titleF_0, self.ui.addrF_0, self.ui.startend_0, self.ui.weather_0],
-                             [self.ui.imageF_1, self.ui.titleF_1, self.ui.addrF_1, self.ui.startend_1, self.ui.weather_1],
-                             [self.ui.imageF_2, self.ui.titleF_2, self.ui.addrF_2, self.ui.startend_2, self.ui.weather_2],
-                             [self.ui.imageF_3, self.ui.titleF_3, self.ui.addrF_3, self.ui.startend_3, self.ui.weather_3],
-                             [self.ui.imageF_4, self.ui.titleF_4, self.ui.addrF_4, self.ui.startend_4, self.ui.weather_4],
-                             [self.ui.imageF_5, self.ui.titleF_5, self.ui.addrF_5, self.ui.startend_5, self.ui.weather_5]
+        self.festivalArr = [ [self.ui.imageF_0, self.ui.titleF_0, self.ui.addrF_0, self.ui.startend_0, self.ui.location_0],
+                             [self.ui.imageF_1, self.ui.titleF_1, self.ui.addrF_1, self.ui.startend_1, self.ui.location_1],
+                             [self.ui.imageF_2, self.ui.titleF_2, self.ui.addrF_2, self.ui.startend_2, self.ui.location_2],
+                             [self.ui.imageF_3, self.ui.titleF_3, self.ui.addrF_3, self.ui.startend_3, self.ui.location_3],
+                             [self.ui.imageF_4, self.ui.titleF_4, self.ui.addrF_4, self.ui.startend_4, self.ui.location_4],
+                             [self.ui.imageF_5, self.ui.titleF_5, self.ui.addrF_5, self.ui.startend_5, self.ui.location_5]
                             ]
+
+        # 빈칸 초기화
+        for i in range(0, movieMAX):
+            self.movieArr[i][0].setText('-')
+            self.movieArr[i][1].setText('-')
+            self.movieArr[i][2].setText('-')
+            self.movieArr[i][3].setText('-')
+        for i in range(0, festivalMAX):
+            self.festivalArr[i][0].setText('-')
+            self.festivalArr[i][1].setText('-')
+            self.festivalArr[i][2].setText('-')
+            self.festivalArr[i][3].setText('-')
+            self.festivalArr[i][4].setText('-')
+
+        self.ui.show()
 
 
     def changeKeyword(self,state):
@@ -103,6 +116,7 @@ class Form(QDialog):
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
+                self.festivalArr[i][4].setText('-')
 
         QMessageBox.warning(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
 
@@ -182,7 +196,7 @@ class Form(QDialog):
                 return
         #행사검색
         else:
-            self.ui.startend_label.setText("시작일~종료일")
+            self.ui.startend_label.setText("시작일 ~ 종료일")
             FestivalList = getTourDataFromDate('searchFestival',area_txt,strDate)
             TourInfo = getTourInfo(False,FestivalList,strDate)
             if TourInfo == None:
@@ -205,6 +219,7 @@ class Form(QDialog):
             self.festivalArr[y][1].setText(festival['title'])
             self.festivalArr[y][2].setText(festival['addr'])
             self.festivalArr[y][3].setText(festival['eventdate'])
+            self.festivalArr[y][4].setText(getLocationData(festival['mapX'],festival['mapY']))
             y += 1
             if y == festivalMAX:
                 break
@@ -214,6 +229,7 @@ class Form(QDialog):
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
+                self.festivalArr[i][4].setText('-')
 
         # 결과창
         self.setOnButton(self.ui.tourButton)
