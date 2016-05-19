@@ -11,7 +11,7 @@
 host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
 
-def MakeHtmlDoc(BookList):
+def MakeHtmlDoc(movieList,tourList):
     from xml.dom.minidom import getDOMImplementation
     #get Dom Implementation
     impl = getDOMImplementation()
@@ -20,39 +20,49 @@ def MakeHtmlDoc(BookList):
     top_element = newdoc.documentElement
     header = newdoc.createElement('header')
     top_element.appendChild(header)
-
     # Body 엘리먼트 생성.
     body = newdoc.createElement('body')
 
-    for bookitem in BookList:
-        #create bold element
-        b = newdoc.createElement('b')
-        #create text node
-        ibsnText = newdoc.createTextNode("ISBN:" + bookitem[0])
-        b.appendChild(ibsnText)
+    if movieList != None:
+        body.appendChild(newdoc.createTextNode("==================== 박스 오피스 ===================="))
+        body.appendChild(newdoc.createElement('br'))
+        body.appendChild(newdoc.createElement('br'))
+        for item in movieList:
+            # BR 태그 (엘리먼트) 생성.
+            br = newdoc.createElement('br')
+            #create bold element
+            p = newdoc.createElement('p')
+            #create text node
+            p.appendChild(newdoc.createTextNode("순위:" + item['rank'] + "     "))
+            p.appendChild(newdoc.createTextNode("제목:" + item['movieNm'] + "     "))
+            p.appendChild(newdoc.createTextNode("개봉일:" + item['openDt'] + "     "))
+            p.appendChild(newdoc.createTextNode("누적관객수:" + item['audiAcc'] + "     "))
+            body.appendChild(p)
+            body.appendChild(br)
+            body.appendChild(br)
 
-        body.appendChild(b)
-
-        # BR 태그 (엘리먼트) 생성.
-        br = newdoc.createElement('br')
-
-        body.appendChild(br)
-
-        #create title Element
-        p = newdoc.createElement('p')
-        #create text node
-        titleText= newdoc.createTextNode("Title:" + bookitem[1])
-        p.appendChild(titleText)
-
-        body.appendChild(p)
-        body.appendChild(br)  #line end
-
+    if tourList != None:
+        body.appendChild(newdoc.createTextNode("==================== 데이트 정보 ===================="))
+        body.appendChild(newdoc.createElement('br'))
+        body.appendChild(newdoc.createElement('br'))
+        for item in tourList:
+            # BR 태그 (엘리먼트) 생성.
+            br = newdoc.createElement('br')
+            # create bold element
+            p = newdoc.createElement('p')
+            # create text node
+            p.appendChild(newdoc.createTextNode("이름:" + item['title'] + "     "))
+            p.appendChild(newdoc.createTextNode("주소:" + item['addr'] + "     "))
+            p.appendChild(newdoc.createTextNode("정보:" + item['eventdate'] + "     "))
+            p.appendChild(newdoc.createTextNode("주변시설:" + item['location'] + "     "))
+            body.appendChild(p)
+            body.appendChild(br)
+            body.appendChild(br)
     #append Body
     top_element.appendChild(body)
-
     return newdoc.toxml()
 
-def sendMail(html,senderAddr,passwd,recipientAddr,title='제목없음',msgtext='내용없음'):
+def sendMail(movielist, tourlist,senderAddr,passwd,recipientAddr,title='제목없음',msgtext='내용없음'):
     import smtplib
     # MIMEMultipart의 MIME을 생성합니다.
     from email.mime.multipart import MIMEMultipart
@@ -65,11 +75,13 @@ def sendMail(html,senderAddr,passwd,recipientAddr,title='제목없음',msgtext='
         msg['From'] = senderAddr
         msg['To'] = recipientAddr
         msgPart = MIMEText(msgtext, 'plain')
-        bookPart = MIMEText(html, 'html', _charset = 'UTF-8')
 
         # 메세지에 생성한 MIME 문서를 첨부합니다.
         msg.attach(msgPart)
-        msg.attach(bookPart)
+        html = MakeHtmlDoc(movielist,tourlist)
+        htmlPart = MIMEText(html, 'html', _charset='UTF-8')
+        msg.attach(htmlPart)
+
         print ("connect smtp server ... ")
         s = smtplib.SMTP(host,port)
         #s.set_debuglevel(1)

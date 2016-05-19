@@ -59,6 +59,8 @@ def getTourDataFromDate(findType, area, date, content='전체 분류',keyword=''
 
 def getLocationData(strX,strY):
     global server, regKey, conn
+    default = "-\n-"
+
     if conn == None:
         conn = HTTPConnection(server)
     uri = userURIBuilder(server, 'locationBasedList', numOfRows='50', ServiceKey=regKey,mapX =strX, mapY = strY, radius = '10000', arrange = 'E' , MobileApp='AppTesting',MobileOS='ETC')
@@ -67,7 +69,7 @@ def getLocationData(strX,strY):
         req = conn.getresponse()
     except WindowsError as error:
         print(error)
-        return None
+        return default
 
     locationList = None
     if int(req.status) == 200:
@@ -75,10 +77,10 @@ def getLocationData(strX,strY):
         locationList = ElementTree.fromstring(req.read())
     else:
         print ("Location API request has been failed!! please retry")
-        return None
+        return default
 
     if locationList == None or locationList.find("body").find("totalCount").text == '0':
-        return None
+        return default
 
     locationList=locationList.getiterator("item")
     restaurant = '-'
@@ -110,19 +112,20 @@ def getTourInfo(isKeyword, festivalList,date):
             image =festival.find("firstimage").text
             mapX = festival.find("mapx").text
             mapY = festival.find("mapy").text
-
             if isKeyword == True:
                 contentType = festival.find("contenttypeid").text
                 for key in contentDic.keys():
                     if contentType == contentDic[key]:
                         contentType = key
                         break
-                festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": contentType, "mapX" :mapX, "mapY" :mapY})
+                festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": contentType, "location" : getLocationData(mapX,mapY)})
             else:
                 eventStartdate = festival.find("eventstartdate").text
                 eventEnddate = festival.find("eventenddate").text
                 if eventStartdate <= date <= eventEnddate:
-                    festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": eventStartdate + " ~ " + eventEnddate, "mapX" :mapX, "mapY" :mapY})
+                    festivalInfo.append({"image": image, "title": title, "addr": addr, "eventdate": eventStartdate + " ~ " + eventEnddate, "location" : getLocationData(mapX,mapY)})
+            if (len(festivalInfo) > 5 ):
+                break
         except:
             continue
     if len(festivalInfo) > 0:

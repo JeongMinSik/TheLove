@@ -40,6 +40,10 @@ class Form(QDialog):
         self.ui.tourButton.clicked.connect(self.showTourData)
         self.ui.mailButton.clicked.connect(self.sendMail)
 
+        #데이터담아두기
+        self.MovieInfo = None
+        self.TourInfo = None
+
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
                          [self.ui.rank_1, self.ui.movieNm_1, self.ui.openDt_1, self.ui.audiAcc_1],
                          [self.ui.rank_2, self.ui.movieNm_2, self.ui.openDt_2, self.ui.audiAcc_2],
@@ -103,19 +107,20 @@ class Form(QDialog):
     def error(self,errorType,keyword):
         # 빈칸 초기화
         if errorType == 0:
+            self.MovieInfo = None
             for i in range(0, movieMAX):
                 self.movieArr[i][0].setText('-')
                 self.movieArr[i][1].setText('-')
                 self.movieArr[i][2].setText('-')
                 self.movieArr[i][3].setText('-')
         elif errorType == 1:
+            self.TourInfo = None
             for i in range(0, festivalMAX):
                 self.festivalArr[i][0].setText('-')
                 self.festivalArr[i][1].setText('-')
                 self.festivalArr[i][2].setText('-')
                 self.festivalArr[i][3].setText('-')
                 self.festivalArr[i][4].setText("-\n-")
-
         QMessageBox.warning(self, "Error", "[ " + keyword + " ] \n위 조건에 맞는 데이터가 없습니다.")
 
 
@@ -143,7 +148,7 @@ class Form(QDialog):
         else:
             type = 'weeklyBoxOffice'
         movieList = getMovieDataFromDate(strDate,type,type_txt,multi_txt,nation_txt)
-        info, list = getMovieInfo(movieList,type)
+        info, self.MovieInfo = getMovieInfo(movieList,type)
 
         if info==None:
             self.setOnButton(self.ui.movieButton)
@@ -152,7 +157,7 @@ class Form(QDialog):
 
         # 영화정보 설정
         y=0
-        for movie in list:
+        for movie in self.MovieInfo:
             self.movieArr[y][0].setText(movie['rank'])
             self.movieArr[y][1].setText(movie['movieNm'])
             self.movieArr[y][2].setText(movie['openDt'])
@@ -181,14 +186,12 @@ class Form(QDialog):
             strDate += '0'
         strDate += str(date.day())
 
-        TourInfo = None
-
         #키워드검색
         if self.ui.checkBox_keyword.isChecked() == True:
             self.ui.startend_label.setText("분류")
             FestivalList = getTourDataFromDate('searchKeyword', area_txt, strDate,content_txt, keyword_txt)
-            TourInfo = getTourInfo(True,FestivalList,strDate)
-            if TourInfo == None:
+            self.TourInfo = getTourInfo(True,FestivalList,strDate)
+            if self.TourInfo == None:
                 self.setOnButton(self.ui.tourButton)
                 self.error(1, "지역:" + area_txt + ", 분류:" + content_txt +", 키워드:'" + keyword_txt + "'")
                 return
@@ -196,8 +199,8 @@ class Form(QDialog):
         else:
             self.ui.startend_label.setText("시작일 ~ 종료일")
             FestivalList = getTourDataFromDate('searchFestival',area_txt,strDate)
-            TourInfo = getTourInfo(False,FestivalList,strDate)
-            if TourInfo == None:
+            self.TourInfo = getTourInfo(False,FestivalList,strDate)
+            if self.TourInfo == None:
                 self.setOnButton(self.ui.tourButton)
                 self.error(1, "지역:" + area_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
                 return
@@ -205,7 +208,7 @@ class Form(QDialog):
         #여행정보 설정
         y=0
         buffer = QPixmap()
-        for festival in TourInfo:
+        for festival in self.TourInfo:
             #이미지보여주기
             req = Request(festival['image'], headers={'User-Agent': 'Mozilla/5.0'})
             data = urlopen(req).read()
@@ -217,12 +220,7 @@ class Form(QDialog):
             self.festivalArr[y][1].setText(festival['title'])
             self.festivalArr[y][2].setText(festival['addr'])
             self.festivalArr[y][3].setText(festival['eventdate'])
-
-            #주변시설검색
-            location = getLocationData(festival['mapX'], festival['mapY'])
-            if location == None:
-                location = "-\n-"
-            self.festivalArr[y][4].setText(location)
+            self.festivalArr[y][4].setText(festival['location'])
 
 
             y += 1
@@ -242,8 +240,7 @@ class Form(QDialog):
 
     # 메일보내기
     def sendMail(self):
-        print("메일보낸다.")
-        result = sendMail("",self.ui.lineEdit_sender.text(),self.ui.lineEdit_passwd.text(),self.ui.lineEdit_recipient.text())
+        result = sendMail(self.MovieInfo,self.TourInfo,self.ui.lineEdit_sender.text(),self.ui.lineEdit_passwd.text(),self.ui.lineEdit_recipient.text())
         # 결과창
         if result is True:
             QMessageBox.information(self, "Success", "메일을 보냈습니다.")

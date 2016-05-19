@@ -2424,7 +2424,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="mail_movie">
          <property name="geometry">
           <rect>
            <x>920</x>
@@ -2437,7 +2437,7 @@
           <string>박스오피스</string>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="mail_tour">
          <property name="geometry">
           <rect>
            <x>920</x>
@@ -2458,10 +2458,10 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>mComboBox_nation</tabstop>
-  <tabstop>mComboBox_multi</tabstop>
-  <tabstop>mComboBox_type</tabstop>
-  <tabstop>dateEdit_Movie</tabstop>
+  <tabstop>lineEdit_sender</tabstop>
+  <tabstop>lineEdit_passwd</tabstop>
+  <tabstop>lineEdit_recipient</tabstop>
+  <tabstop>mailButton</tabstop>
   <tabstop>movieButton</tabstop>
   <tabstop>checkBox_keyword</tabstop>
   <tabstop>ComboBox_content</tabstop>
@@ -2470,12 +2470,13 @@
   <tabstop>ComboBox_area</tabstop>
   <tabstop>dateEdit_Tour</tabstop>
   <tabstop>tourButton</tabstop>
-  <tabstop>mailButton</tabstop>
-  <tabstop>lineEdit_passwd</tabstop>
-  <tabstop>lineEdit_sender</tabstop>
-  <tabstop>lineEdit_recipient</tabstop>
-  <tabstop>checkBox</tabstop>
-  <tabstop>checkBox_2</tabstop>
+  <tabstop>dateEdit_Movie</tabstop>
+  <tabstop>mComboBox_multi</tabstop>
+  <tabstop>mComboBox_nation</tabstop>
+  <tabstop>mComboBox_type</tabstop>
+  <tabstop>mail_movie</tabstop>
+  <tabstop>mail_tour</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>
