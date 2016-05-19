@@ -12,6 +12,7 @@ from urllib.request import Request, urlopen
 
 from movie import *
 from tour import *
+from gmail import *
 
 ##global
 movieMAX = 10
@@ -31,12 +32,13 @@ class Form(QDialog):
         self.ui.checkBox_keyword.toggle()
 
         #함수 연결
-        self.ui.checkBox_keyword.stateChanged.connect(self.changeKeyword)
-        self.ui.checkBox_festival.stateChanged.connect(self.changeFestival)
+        self.ui.checkBox_keyword.clicked.connect(self.changeKeyword)
+        self.ui.checkBox_festival.clicked.connect(self.changeFestival)
         self.ui.movieButton.toggled.connect(self.setOffMovieButton)
         self.ui.movieButton.clicked.connect(self.showMovieData)
         self.ui.tourButton.toggled.connect(self.setOffTourButton)
         self.ui.tourButton.clicked.connect(self.showTourData)
+        self.ui.mailButton.clicked.connect(self.sendMail)
 
         self.movieArr= [ [self.ui.rank_0, self.ui.movieNm_0, self.ui.openDt_0,self.ui.audiAcc_0],
                          [self.ui.rank_1, self.ui.movieNm_1, self.ui.openDt_1, self.ui.audiAcc_1],
@@ -73,23 +75,17 @@ class Form(QDialog):
         self.ui.show()
 
 
-    def changeKeyword(self,state):
-        if state == Qt.Checked:
-            self.ui.checkBox_festival.setCheckState(Qt.Unchecked)
-            self.ui.ComboBox_content.setEnabled(True)
-            self.ui.lineEdit_keyword.setEnabled(True)
-            self.ui.dateEdit_Tour.setEnabled(False)
-        else:
-            self.ui.checkBox_festival.setCheckState(Qt.Checked)
+    def changeKeyword(self):
+       if self.ui.checkBox_keyword.isChecked() is True:
+           self.ui.ComboBox_content.setEnabled(True)
+           self.ui.lineEdit_keyword.setEnabled(True)
+           self.ui.dateEdit_Tour.setEnabled(False)
+
+    def changeFestival(self):
+        if self.ui.checkBox_festival.isChecked() is True:
             self.ui.ComboBox_content.setEnabled(False)
             self.ui.lineEdit_keyword.setEnabled(False)
             self.ui.dateEdit_Tour.setEnabled(True)
-
-    def changeFestival(self, state):
-        if state == Qt.Checked:
-            self.ui.checkBox_keyword.setCheckState(Qt.Unchecked)
-        else:
-            self.ui.checkBox_keyword.setCheckState(Qt.Checked)
 
     def setOffMovieButton(self):
         self.ui.movieButton.setText("검색 중...")
@@ -243,6 +239,16 @@ class Form(QDialog):
         # 결과창
         self.setOnButton(self.ui.tourButton)
         QMessageBox.information(self, "Success", "\n 데이트정보 조회가 완료되었습니다!")
+
+    # 메일보내기
+    def sendMail(self):
+        print("메일보낸다.")
+        result = sendMail("",self.ui.lineEdit_sender.text(),self.ui.lineEdit_passwd.text(),self.ui.lineEdit_recipient.text())
+        # 결과창
+        if result is True:
+            QMessageBox.information(self, "Success", "메일을 보냈습니다.")
+        else:
+            QMessageBox.information(self, "Fail", "메일 보내기 실패!")
 
 if __name__ == '__main__':
     while(True):

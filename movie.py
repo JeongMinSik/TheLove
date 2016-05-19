@@ -41,7 +41,7 @@ def getMovieDataFromDate(date,type,week,multi,nation):
     #옵션변경
     week, multi, nation = changeOption(week,multi,nation)
     uri = userURIBuilder(server, type, key=regKey, targetDt=date, weekGb=week, multiMovieYn =multi, repNationCd = nation)
-
+    print(uri)
     try:
         conn.request("GET", uri)
         req = conn.getresponse()
