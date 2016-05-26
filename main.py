@@ -152,6 +152,7 @@ class Form(QDialog):
 
         if info==None:
             self.setOnButton(self.ui.movieButton)
+            self.ui.mail_movie.setEnabled(False)
             self.error(0,"구분:" + type_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
             return
 
@@ -166,6 +167,7 @@ class Form(QDialog):
 
         # 결과창
         self.setOnButton(self.ui.movieButton)
+        self.ui.mail_movie.setEnabled(True)
         QMessageBox.information(self, "Success", info + "\n \t  조회가 완료되었습니다!")
 
     #여행 데이터 불러오기
@@ -193,6 +195,7 @@ class Form(QDialog):
             self.TourInfo = getTourInfo(True,FestivalList,strDate)
             if self.TourInfo == None:
                 self.setOnButton(self.ui.tourButton)
+                self.ui.mail_tour.setEnabled(False)
                 self.error(1, "지역:" + area_txt + ", 분류:" + content_txt +", 키워드:'" + keyword_txt + "'")
                 return
         #행사검색
@@ -202,6 +205,7 @@ class Form(QDialog):
             self.TourInfo = getTourInfo(False,FestivalList,strDate)
             if self.TourInfo == None:
                 self.setOnButton(self.ui.tourButton)
+                self.ui.mail_tour.setEnabled(False)
                 self.error(1, "지역:" + area_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
                 return
 
@@ -236,11 +240,31 @@ class Form(QDialog):
 
         # 결과창
         self.setOnButton(self.ui.tourButton)
+        self.ui.mail_tour.setEnabled(True)
         QMessageBox.information(self, "Success", "\n 데이트정보 조회가 완료되었습니다!")
 
     # 메일보내기
     def sendMail(self):
-        result = sendMail(self.MovieInfo,self.TourInfo,self.ui.lineEdit_sender.text(),self.ui.lineEdit_passwd.text(),self.ui.lineEdit_recipient.text())
+
+        MovieInfo, TourInfo, host, port = None, None, None, None
+        if self.ui.mail_movie.isChecked() is True:
+            MovieInfo = self.MovieInfo
+        if self.ui.mail_tour.isChecked() is True:
+            TourInfo = self.TourInfo
+
+        if MovieInfo == None and TourInfo == None:
+            QMessageBox.information(self, "Fail", "메일 보내기 실패!\n첨부된 내용이 없습니다.")
+            return
+
+        if self.ui.comboBox_mail.currentText() == "네이버메일":
+            host = "smtp.naver.com"
+        elif self.ui.comboBox_mail.currentText() == "지메일":
+            host = "smtp.gmail.com"
+        try:
+            result = sendMail(host, MovieInfo,TourInfo,self.ui.lineEdit_sender.text(),self.ui.lineEdit_passwd.text(),self.ui.lineEdit_recipient.text(),self.ui.lineEdit_title.text())
+        except WindowsError as error:
+            print(error)
+            result = False
         # 결과창
         if result is True:
             QMessageBox.information(self, "Success", "메일을 보냈습니다.")

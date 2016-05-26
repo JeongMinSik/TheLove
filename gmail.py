@@ -8,7 +8,7 @@
 #conn.request("GET", "/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.xml?repNationCd=&targetDt=20160518&key=b2469288dbc7cf61d1484f741294e1a5&weekGb=&multiMovieYn=&")
 
 # smtp 정보
-host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
+#host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
 
 def MakeHtmlDoc(movieList,tourList):
@@ -62,7 +62,7 @@ def MakeHtmlDoc(movieList,tourList):
     top_element.appendChild(body)
     return newdoc.toxml()
 
-def sendMail(movielist, tourlist,senderAddr,passwd,recipientAddr,title='제목없음',msgtext='내용없음'):
+def sendMail(host,movielist, tourlist,senderAddr,passwd,recipientAddr,title='제목없음',msgtext='내용없음'):
     import smtplib
     # MIMEMultipart의 MIME을 생성합니다.
     from email.mime.multipart import MIMEMultipart
@@ -93,6 +93,7 @@ def sendMail(movielist, tourlist,senderAddr,passwd,recipientAddr,title='제목�
         s.close()
         print ("Mail sending complete!!!")
         return True
-    except:
+    except WindowsError as error:
+        print(error)
         print("Mail sending Fail!!!")
         return False
