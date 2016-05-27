@@ -93,7 +93,6 @@ def sendMail(host,movielist, tourlist,senderAddr,passwd,recipientAddr,title='제
         s.close()
         print ("Mail sending complete!!!")
         return True
-    except WindowsError as error:
-        print(error)
+    except:
         print("Mail sending Fail!!!")
         return False

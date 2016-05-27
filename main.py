@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 
 from movie import *
 from tour import *
-from gmail import *
+from mail import *
 
 ##global
 movieMAX = 10
@@ -25,7 +25,26 @@ class Form(QDialog):
 
         QDialog.__init__(self, parent)
         self.ui = uic.loadUi("ui.ui",self)
-        self.ui.setWindowIcon(QIcon('heart.ico'))
+        self.ui.setWindowIcon(QIcon("resource/heart.ico"))
+        buffer = QPixmap()
+        Img = QImage()
+        #영화이미지
+        lmg = Img.load("resource/movie.png")
+        buffer = buffer.fromImage(Img)
+        self.ui.movie_image.setPixmap(buffer)
+        #여행이미지
+        lmg = Img.load("resource/tour.png")
+        buffer = buffer.fromImage(Img)
+        self.ui.date_image.setPixmap(buffer)
+        #지메일
+        lmg = Img.load("resource/gmail.png")
+        buffer = buffer.fromImage(Img)
+        self.ui.gmail_image.setPixmap(buffer)
+        #네이버
+        lmg = Img.load("resource/naver.png")
+        buffer = buffer.fromImage(Img)
+        self.ui.naver_image.setPixmap(buffer)
+
         self.ui.dateEdit_Movie.setDate(date.fromtimestamp(time.time()-60*60*24)) #어제
         self.ui.dateEdit_Tour.setDate(date.today())
 
@@ -209,6 +228,8 @@ class Form(QDialog):
                 self.error(1, "지역:" + area_txt + ", 날짜:"+ str(date.year()) + "년 " + str(date.month()) +"월 "+ str(date.day()) + "일")
                 return
 
+
+
         #여행정보 설정
         y=0
         buffer = QPixmap()
@@ -262,8 +283,7 @@ class Form(QDialog):
             host = "smtp.gmail.com"
         try:
             result = sendMail(host, MovieInfo,TourInfo,self.ui.lineEdit_sender.text(),self.ui.lineEdit_passwd.text(),self.ui.lineEdit_recipient.text(),self.ui.lineEdit_title.text())
-        except WindowsError as error:
-            print(error)
+        except:
             result = False
         # 결과창
         if result is True:
