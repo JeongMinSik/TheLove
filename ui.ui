@@ -44,7 +44,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_5">
         <attribute name="title">
@@ -1089,17 +1089,17 @@
         <widget class="QLabel" name="movie_image">
          <property name="geometry">
           <rect>
-           <x>630</x>
-           <y>670</y>
-           <width>121</width>
-           <height>91</height>
+           <x>590</x>
+           <y>640</y>
+           <width>161</width>
+           <height>141</height>
           </rect>
          </property>
          <property name="text">
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap>영화 보는 이모티콘.png</pixmap>
+          <pixmap>데이트.png</pixmap>
          </property>
         </widget>
        </widget>
@@ -2592,6 +2592,35 @@
          </property>
          <property name="pixmap">
           <pixmap>네이버 아이콘.png</pixmap>
+         </property>
+        </widget>
+        <widget class="QLabel" name="mail_image">
+         <property name="geometry">
+          <rect>
+           <x>920</x>
+           <y>480</y>
+           <width>401</width>
+           <height>291</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_5">
+         <property name="geometry">
+          <rect>
+           <x>1090</x>
+           <y>739</y>
+           <width>101</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 255);</string>
+         </property>
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </widget>

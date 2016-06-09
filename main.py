@@ -10,6 +10,9 @@ from PyQt5.QtNetwork import *
 from PyQt5 import uic
 from urllib.request import Request, urlopen
 
+from datetime import date
+import time
+
 from movie import *
 from tour import *
 from mail import *
@@ -18,24 +21,25 @@ from mail import *
 movieMAX = 10
 festivalMAX = 6
 
+i=0
+
 class Form(QDialog):
     def __init__(self, parent=None):
-        from datetime import date
-        import time
-
         QDialog.__init__(self, parent)
         self.ui = uic.loadUi("ui.ui",self)
         self.ui.setWindowIcon(QIcon("resource/heart.ico"))
         buffer = QPixmap()
         Img = QImage()
         #영화이미지
-        lmg = Img.load("resource/movie.png")
-        buffer = buffer.fromImage(Img)
-        self.ui.movie_image.setPixmap(buffer)
+        #lmg = Img.load("resource/movie.gif")
+        #buffer = buffer.fromImage(Img)
+        #self.ui.movie_image.setPixmap(buffer.scaled(self.ui.movie_image.size()))
+
         #여행이미지
-        lmg = Img.load("resource/tour.png")
-        buffer = buffer.fromImage(Img)
-        self.ui.date_image.setPixmap(buffer)
+        #lmg = Img.load("resource/tour.png")
+        #buffer = buffer.fromImage(Img)
+        #self.ui.date_image.setPixmap(buffer)
+
         #지메일
         lmg = Img.load("resource/gmail.png")
         buffer = buffer.fromImage(Img)
@@ -95,7 +99,10 @@ class Form(QDialog):
             self.festivalArr[i][3].setText('-')
             self.festivalArr[i][4].setText("-\n-")
 
+
         self.ui.show()
+
+
 
 
     def changeKeyword(self):
@@ -292,7 +299,28 @@ class Form(QDialog):
             QMessageBox.information(self, "Fail", "메일 보내기 실패!")
 
 if __name__ == '__main__':
-    while(True):
-        app = QApplication(sys.argv)
-        f = Form()
-        sys.exit(app.exec())
+    app = QApplication(sys.argv)
+    f = Form()
+    i=0
+    buffer = QPixmap()
+    Img = QImage()
+    while True:
+        t = time.time()
+        while (time.time() - t < 0.15):
+            app.processEvents()
+        # 영화이미지
+        lmg = Img.load("resource/movie_0" + str(i) + ".png")
+        buffer = buffer.fromImage(Img)
+        f.ui.movie_image.setPixmap(buffer.scaled(f.ui.movie_image.size()))
+        # 데이트이미지
+        lmg = Img.load("resource/BOBO" + str(i) + ".png")
+        buffer = buffer.fromImage(Img)
+        f.ui.date_image.setPixmap(buffer.scaled(f.ui.date_image.size()))
+        # 메일이미지
+        lmg = Img.load("resource/hi" + str(i) + ".png")
+        buffer = buffer.fromImage(Img)
+        f.ui.mail_image.setPixmap(buffer.scaled(f.ui.mail_image.size()))
+        i = (i + 1) % 5
+    sys.exit(app.exec())
+
+
