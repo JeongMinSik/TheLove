@@ -35,7 +35,6 @@ def changeOption(week,multi,nation):
 
 def getMovieDataFromDate(date,type,week,multi,nation):
     global server, regKey, conn
-    print(date,type,week,multi,nation)
     if conn == None:
         conn = HTTPConnection(server)
 

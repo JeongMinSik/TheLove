@@ -1,3 +1,12 @@
+#from http.client import HTTPConnection
+
+##global
+#conn = None
+#server = "api.visitkorea.or.kr"
+
+#conn = HTTPConnection(server)
+#conn.request("GET", "/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.xml?repNationCd=&targetDt=20160518&key=b2469288dbc7cf61d1484f741294e1a5&weekGb=&multiMovieYn=&")
+
 # smtp 정보
 #host = "smtp.gmail.com" # Gmail SMTP 서버 주소.
 port = "587"
